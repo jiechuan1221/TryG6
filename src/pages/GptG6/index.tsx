@@ -1,5 +1,14 @@
 import React, { Fragment, useEffect, useRef } from "react";
-import G6, { IEdge, IEvent, INode, Item } from "@antv/g6";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import G6, {
+  IEdge,
+  IEvent,
+  IGroup,
+  INode,
+  Item,
+  ModelConfig,
+  NodeConfig,
+} from "@antv/g6";
 import DefaultGraphCfg, {
   getContextMenu,
   getMiniMap,
@@ -7,6 +16,7 @@ import DefaultGraphCfg, {
   getToolBar,
 } from "./defaultGraphCfg";
 import styled from "styled-components";
+import { IModuleConf } from "@wangeditor/editor";
 
 const G6Container = styled.div`
   position: relative;
@@ -35,6 +45,169 @@ const G6Container = styled.div`
     }
   }
 `;
+G6.registerBehavior("click-add-edge", {
+  // Set the events and the corresponding responsing function for this behavior
+  getEvents() {
+    return {
+      "node:click": "onClick", // The event is canvas:click, the responsing function is onClick
+      mousemove: "onMousemove", // The event is mousemove, the responsing function is onMousemove
+      "edge:click": "onEdgeClick", // The event is edge:click, the responsing function is onEdgeClick
+    };
+  },
+  // The responsing function for node:click defined in getEvents
+  onClick(ev: IEvent) {
+    const self = this;
+    const node = ev.item as any;
+    const graph = self.graph as any;
+    // The position where the mouse clicks
+    const point = { x: ev.x, y: ev.y };
+    const model = node.getModel();
+    if (self.addingEdge && self.edge) {
+      graph.updateItem(self.edge, {
+        target: model.id,
+      });
+
+      console.log(self);
+
+      graph.refreshItem(self.edge);
+      self.edge = null;
+      graph.setMode("default");
+    } else {
+      // Add anew edge, the end node is the current node user clicks
+      self.edge = graph.addItem("edge", {
+        source: model.id,
+        target: model.id,
+      });
+      self.addingEdge = true;
+    }
+  },
+  // The responsing function for mousemove defined in getEvents
+  onMousemove(ev: IEvent) {
+    const self = this;
+    // The current position the mouse clicks
+    const point = { x: ev.x, y: ev.y };
+    if (self.addingEdge && self.edge) {
+      // Update the end node to the current node the mouse clicks
+      (self.graph as any).updateItem(self.edge, {
+        target: point,
+      });
+    }
+  },
+  // The responsing function for edge:click defined in getEvents
+  onEdgeClick(ev: IEvent) {
+    const self = this;
+    const currentEdge = ev.item;
+    if (self.addingEdge && self.edge === currentEdge) {
+      (self.graph as any).removeItem(self.edge);
+      self.edge = null;
+      self.addingEdge = false;
+    }
+  },
+});
+G6.registerBehavior("click-del-edge", {
+  // Set the events and the corresponding responsing function for this behavior
+  getEvents() {
+    return {
+      "edge:click": "onEdgeClick", // The event is edge:click, the responsing function is onEdgeClick
+    };
+  },
+  onEdgeClick(ev: any) {
+    const self = this;
+    const currentEdge = ev.item as IEdge;
+    const graph = self.graph as any;
+    graph.removeItem(currentEdge);
+    graph.setMode("default");
+  },
+});
+G6.registerBehavior("click-change-edge", {
+  getEvents() {
+    return {
+      "edge:click": "onEdgeClick",
+    };
+  },
+  onEdgeClick(ev: any) {
+    const self = this;
+    const currentEdge = ev.item as IEdge;
+    const graph = self.graph as any;
+    const model = currentEdge.getModel();
+    console.log(model);
+    graph.updateItem(currentEdge, {
+      style: {
+        stroke: "lightBlue", // 边的颜色改为红色
+        lineDash: [5, 5], // 边的线型改为实线
+        lineWidth: 10,
+      },
+      label: "修改的文本test",
+      labelCfg: {
+        style: {
+          fill: "#1890ff",
+          fontSize: 14,
+          background: {
+            fill: "#ffffff",
+            stroke: "#9EC9FF",
+            padding: [2, 2, 2, 2],
+            radius: 2,
+          },
+          fontFamily: "Italic",
+        },
+      },
+    });
+    graph.setMode("default");
+  },
+});
+G6.registerBehavior("click-add-nodeTag", {
+  getEvents() {
+    return {
+      "node:click": "onClick",
+    };
+  },
+  onClick(evt: any) {
+    const self = this;
+    const node = evt.item as INode;
+    const graph = self.graph as any;
+    const group = node.getContainer();
+
+    const badge = group.addShape("image", {
+      attrs: {
+        x: -17,
+        y: 10,
+        width: 20,
+        height: 20,
+        stroke: "#bfc",
+        img:
+          "https://images.pexels.com/photos/16117986/pexels-photo-16117986.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+      },
+      icon: true,
+      name: "marker",
+    });
+    
+    graph.setMode("default");
+  },
+});
+
+// Scale Animation
+G6.registerNode(
+  'circle-animate',
+  {
+    afterDraw(cfg, group) {
+      const shape = group?.get('children')[0];
+      shape.animate(
+        (ratio: any) => {
+          const diff = ratio <= 0.5 ? ratio * 10 : (1 - ratio) * 10;
+          return {
+            r: (cfg?.size as number) / 2 + diff,
+          };
+        },
+        {
+          repeat: true,
+          duration: 3000,
+          easing: 'easeCubic',
+        },
+      );
+    },
+  },
+  'circle',
+);
 
 const GptG6 = () => {
   const ref = useRef(null);
@@ -111,63 +284,6 @@ const GptG6 = () => {
 
     graph.data(data1);
 
-    G6.registerBehavior("click-add-edge", {
-      // Set the events and the corresponding responsing function for this behavior
-      getEvents() {
-        return {
-          "node:click": "onClick", // The event is canvas:click, the responsing function is onClick
-          mousemove: "onMousemove", // The event is mousemove, the responsing function is onMousemove
-          "edge:click": "onEdgeClick", // The event is edge:click, the responsing function is onEdgeClick
-        };
-      },
-      // The responsing function for node:click defined in getEvents
-      onClick(ev: IEvent) {
-        const self = this;
-        const node = ev.item as any;
-        const graph = self.graph as any;
-        // The position where the mouse clicks
-        const point = { x: ev.x, y: ev.y };
-        const model = node.getModel();
-        if (self.addingEdge && self.edge) {
-          graph.updateItem(self.edge, {
-            target: model.id,
-          });
-
-          self.edge = null;
-          self.addingEdge = false;
-          graph.setMode("default");
-        } else {
-          // Add anew edge, the end node is the current node user clicks
-          self.edge = graph.addItem("edge", {
-            source: model.id,
-            target: model.id,
-          });
-          self.addingEdge = true;
-        }
-      },
-      // The responsing function for mousemove defined in getEvents
-      onMousemove(ev: IEvent) {
-        const self = this;
-        // The current position the mouse clicks
-        const point = { x: ev.x, y: ev.y };
-        if (self.addingEdge && self.edge) {
-          // Update the end node to the current node the mouse clicks
-          (self.graph as any).updateItem(self.edge, {
-            target: point,
-          });
-        }
-      },
-      // The responsing function for edge:click defined in getEvents
-      onEdgeClick(ev: IEvent) {
-        const self = this;
-        const currentEdge = ev.item;
-        if (self.addingEdge && self.edge === currentEdge) {
-          (self.graph as any).removeItem(self.edge);
-          self.edge = null;
-          self.addingEdge = false;
-        }
-      },
-    });
     // 用于清除所有状态
     const clearAllStates = () => {
       graph.setAutoPaint(false);

@@ -92,14 +92,18 @@ export const getToolbar = () =>
             <li code='shift' title='请按住"shift"键进行节点圈选'>sft</li>
             <li code='delEdge'>删除线</li>
             <li code='changeEdge'>改变线样式</li>
+            <li code='addNodeTag'>节点打标</li>
         </ul>`;
     },
     handleClick: (code, graph) => {
       if (code === "addEdge") {
-        // getToolbar().undo();
         graph.setMode("addEdge");
-      } else if (code === "center") {
-        DefaultGraphCfg.fitCenter = true;
+      } else if (code === "delEdge") {
+        graph.setMode("delEdge");
+      } else if (code === "changeEdge") {
+        graph.setMode("changeEdge");
+      } else if (code === "addNodeTag") {
+        graph.setMode("addNodeTag");
       } else {
         // 其他操作保持默认不变
         getToolbar().handleDefaultOperator(code);
@@ -111,10 +115,13 @@ const DefaultGraphCfg = {
   width: 800,
   height: 600,
   defaultNode: {
+    type: "circle",
     size: 40,
     style: {
       fill: "steelBlue",
       stroke: "blue",
+      shadowColor: "black",
+      shadowBlur: 20
     },
     labelCfg: {
       position: "bottom",
@@ -123,6 +130,7 @@ const DefaultGraphCfg = {
         fontFamily: "KaiTi",
       },
     },
+    
   },
   defaultEdge: {
     style: {
@@ -130,9 +138,23 @@ const DefaultGraphCfg = {
       stroke: "grey",
       endArrow: { path: G6.Arrow.triangle(6, 8), fill: "lightGrey" },
     },
+    // labelCfg: {
+    //   autoRotate: true,
+    // },
     labelCfg: {
         autoRotate: true,
-    }
+        style: {
+        fill: "#1890ff",
+        fontSize: 10,
+        background: {
+          fill: "#ffffff",
+          // stroke: "#9EC9FF",
+          padding: [2, 2, 2, 2],
+          radius: 2,
+        },
+        fontFamily: "Italic",
+      },
+    },
   },
   nodeStateStyles: {
     hover: {
@@ -179,11 +201,14 @@ const DefaultGraphCfg = {
       "lasso-select",
     ],
     addEdge: ["click-add-edge", "click-select"],
+    delEdge: ["click-del-edge", "drag-node", "zoom-canvas"],
+    changeEdge: ["click-change-edge", "drag-node", "zoom-canvas"],
+    addNodeTag: ['click-add-nodeTag', 'drag-node', 'zoom-canvas']
   },
   layout: {
-    type: "force",
+    type: "forceAtlas2",
     preventOverlap: true,
-    linkDistance: 200,
+    linkDistance: 300,
   },
   animate: true,
   //   配置工具toolBar的时候用于回退和重做的操作
