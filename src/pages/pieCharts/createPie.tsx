@@ -1,59 +1,65 @@
-import * as echarts from 'echarts/core';
-import {
-  PieChart,
-  LineChart
-} from 'echarts/charts';
+import React, { CSSProperties, FC } from "react";
+
+import ReactEChartsCore from "echarts-for-react/lib/core";
+// 引入 echarts 的核心模块
+import * as echarts from "echarts/core";
+// 按需导入图表
+import { PieChart, PieSeriesOption } from "echarts/charts";
+// 按需导入图表相关的组件
 import {
   TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  // 数据集组件
-  DatasetComponent,
-  // 内置数据转换器组件 (filter, sort)
-  TransformComponent
-} from 'echarts/components';
-import { LabelLayout, UniversalTransition } from 'echarts/features';
-import { CanvasRenderer } from 'echarts/renderers';
-import type {
-  // 系列类型的定义后缀都为 SeriesOption
-  BarSeriesOption, 
-  LineSeriesOption
-} from 'echarts/charts';
-import type {
   // 组件类型的定义后缀都为 ComponentOption
   TitleComponentOption,
+  TooltipComponent,
   TooltipComponentOption,
-  GridComponentOption,
-  DatasetComponentOption
-} from 'echarts/components';
-import type { 
-  ComposeOption, 
-} from 'echarts/core';
+  // 数据集组件
+  DatasetComponent,
+  DatasetComponentOption,
+} from "echarts/components";
+
+// 引入底层的渲染引擎
+import { CanvasRenderer } from "echarts/renderers";
 
 // 通过 ComposeOption 来组合出一个只有必须组件和图表的 Option 类型
-type ECOption = ComposeOption<
-  | BarSeriesOption
-  | LineSeriesOption
+export type ECOption = echarts.ComposeOption<
+  | PieSeriesOption
   | TitleComponentOption
   | TooltipComponentOption
-  | GridComponentOption
   | DatasetComponentOption
 >;
 
-// 注册必须的组件
-echarts.use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  DatasetComponent,
-  TransformComponent,
-  PieChart,
-  LineChart,
-  LabelLayout,
-  UniversalTransition,
-  CanvasRenderer
-]);
+interface CustomProps {
+  chartStyle?: CSSProperties;
+  chartOptions: ECOption;
+}
 
-const option: ECOption = {
-  // ...
+const CustomCaseStatisticPieChart: FC<CustomProps> = (props) => {
+  const { chartOptions, chartStyle = {} } = props;
+
+  const initialChartStyle = {
+    width: "300px",
+    height: "300px",
+  };
+
+  // 注册必要组件
+  echarts.use([
+    TitleComponent,
+    TooltipComponent,
+    PieChart,
+    DatasetComponent,
+    CanvasRenderer,
+  ]);
+
+
+  return (
+    <ReactEChartsCore
+      style={{ ...initialChartStyle, ...chartStyle }}
+      echarts={echarts}
+      option={chartOptions}
+      notMerge={true}
+      lazyUpdate={true}
+    />
+  );
 };
+
+export default CustomCaseStatisticPieChart;

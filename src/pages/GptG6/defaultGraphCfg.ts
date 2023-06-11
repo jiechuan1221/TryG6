@@ -183,12 +183,12 @@ const DefaultGraphCfg = {
     },
     selected: {
       stroke: "#bfc",
-      lineWidth: 2,
+      lineWidth: 1,
       shadowBlur: 2,
     },
     active: {
       stroke: "#6f9fff",
-      lineWidth: 2,
+      lineWidth: 1,
       shadowBlur: 2,
     },
   },

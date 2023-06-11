@@ -1,14 +1,6 @@
 import React, { Fragment, useEffect, useRef } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import G6, {
-  IEdge,
-  IEvent,
-  IGroup,
-  INode,
-  Item,
-  ModelConfig,
-  NodeConfig,
-} from "@antv/g6";
+import G6, { IEdge, IEvent, INode } from "@antv/g6";
 import DefaultGraphCfg, {
   getContextMenu,
   getMiniMap,
@@ -180,17 +172,17 @@ G6.registerBehavior("click-add-nodeTag", {
       icon: true,
       name: "marker",
     });
-    
+
     graph.setMode("default");
   },
 });
 
 // Scale Animation
 G6.registerNode(
-  'circle-animate',
+  "circle-animate",
   {
     afterDraw(cfg, group) {
-      const shape = group?.get('children')[0];
+      const shape = group?.get("children")[0];
       shape.animate(
         (ratio: any) => {
           const diff = ratio <= 0.5 ? ratio * 10 : (1 - ratio) * 10;
@@ -201,12 +193,12 @@ G6.registerNode(
         {
           repeat: true,
           duration: 3000,
-          easing: 'easeCubic',
-        },
+          easing: "easeCubic",
+        }
       );
     },
   },
-  'circle',
+  "circle"
 );
 
 const GptG6 = () => {

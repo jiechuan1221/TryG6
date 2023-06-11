@@ -10,7 +10,7 @@ import RetryG6 from "./pages/RetryG6";
 import PieChart from "./pages/pieCharts";
 
 function App() {
-  return <><PieChart /></>;
+  return <><GptG6 /></ >; 
 }
 
 export default App;
