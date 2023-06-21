@@ -1,6 +1,6 @@
-import React, { Fragment, useEffect, useRef } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import G6, { IEdge, IEvent, INode } from "@antv/g6";
+import G6, { IEdge, IEvent, INode, Item, ModelConfig } from "@antv/g6";
 import DefaultGraphCfg, {
   getContextMenu,
   getMiniMap,
@@ -9,6 +9,10 @@ import DefaultGraphCfg, {
 } from "./defaultGraphCfg";
 import styled from "styled-components";
 import { IModuleConf } from "@wangeditor/editor";
+import { IGroup } from "@arco-design/chart-space/esm/typings/group";
+import image from "./uid-flag.svg";
+import img from "./relation-flag.svg";
+import ContextMenu from "./contextmenu";
 
 const G6Container = styled.div`
   position: relative;
@@ -177,6 +181,146 @@ G6.registerBehavior("click-add-nodeTag", {
   },
 });
 
+G6.registerNode("uid-node", {
+  draw: (cfg: any, group: any) => {
+    console.log(cfg);
+
+    const keyShape = group!.addShape("circle", {
+      attrs: {
+        r: 12,
+        stroke: "#f6f7fb",
+        fill: "red",
+        cursor: "pointer",
+      },
+      isKeyShape: true,
+      name: "circle",
+    });
+    if (cfg!.extra.flag) {
+      group!.addShape("image", {
+        attrs: {
+          x: -5,
+          y: -4.5,
+          width: 10,
+          height: 10,
+          stroke: "#bfc",
+          cursor: "pointer",
+          img: image,
+        },
+        draggable: true,
+        icon: true,
+        name: "tag",
+      });
+    }
+    return keyShape;
+  },
+  setState(name, value, item: Item | undefined) {
+    const group = (item as Item).getContainer();
+    const shape = group.get("children")[0];
+
+    // 只要有一个状态就是高亮的
+    const hasSelected = (item as Item).hasState("selected");
+    const hasActive = (item as Item).hasState("active");
+    const hasHover = (item as Item).hasState("hover");
+    const hasFocus = (item as Item).hasState("focus");
+    if (hasSelected || hasActive || hasHover || hasFocus) {
+      shape.attr("fill", "grey");
+    } else {
+      shape.attr("fill", "red");
+    }
+  },
+});
+const NODE_TEXT = {
+  uid: "UID",
+  did: "DID",
+  wifimac: "WIFIMAC",
+  ip: "IP",
+  group: "同群",
+  mobile: "手机号",
+  shop: "店铺",
+  identity: "身份证",
+  txt: "TXT",
+  follow: "互关",
+};
+
+G6.registerNode("relation-node", {
+  draw: (cfg: any, group: any) => {
+    const node_text: string =
+      NODE_TEXT[(cfg!.id as string).split("-")[0] as keyof typeof NODE_TEXT];
+
+    let strockColor = "rgba(0, 0, 0, 0)";
+    let fillColor = "rgba(0, 0, 0, 0)";
+    if (cfg!.extra.flag) {
+      strockColor = "#E5E8EF";
+      fillColor = "#fff";
+    }
+
+    const keyShape = group!.addShape("rect", {
+      attrs: {
+        width: node_text.length * 11,
+        height: 20,
+        stroke: strockColor,
+        fill: fillColor,
+        radius: 3,
+        cursor: "pointer",
+        textAlign: "center",
+        textBaseline: "middle",
+        shadowBlur: 12,
+      },
+      draggable: true,
+      name: "rect",
+    });
+
+    group!.addShape("text", {
+      attrs: {
+        x: (node_text.length * 11) / 2,
+        y: 10,
+        text: node_text,
+        fontSiz: 12,
+        stroke: "#f6f7fb",
+        fill: "grey",
+        cursor: "pointer",
+        textAlign: "center",
+        textBaseline: "middle",
+      },
+      draggable: true,
+      name: "text",
+    });
+
+    if (cfg!.extra.flag) {
+      group!.addShape("image", {
+        attrs: {
+          x: -5,
+          y: -4.5,
+          width: 10,
+          height: 10,
+          stroke: "#bfc",
+          cursor: "pointer",
+          img: img,
+        },
+        // icon: true,
+        draggable: true,
+        name: "tag",
+      });
+    }
+
+    return keyShape;
+  },
+  setState(name, value, item: Item | undefined) {
+    const group = (item as Item).getContainer();
+    const shape = group.get("children")[1];
+
+    const hasSelected = (item as Item).hasState("selected");
+    const hasActive = (item as Item).hasState("active");
+    const hasHover = (item as Item).hasState("hover");
+    const hasFocus = (item as Item).hasState("focus");
+    if (hasSelected || hasActive || hasHover || hasFocus) {
+      shape.attr("fill", "red");
+    } else {
+      shape.attr("fill", "grey");
+    }
+  },
+});
+
 // Scale Animation
 G6.registerNode(
   "circle-animate",
@@ -203,6 +347,36 @@ G6.registerNode(
 
 const GptG6 = () => {
   const ref = useRef(null);
+
+  const [dbClickMenuVisiable, setDbClickMenuVisiable] = useState<boolean>(
+    false
+  );
+  const [dbNode, setDbNode] = useState<INode | undefined>();
+  const [nodeXY, setNodeXY] = useState<number[]>([]);
+  const [nodeId, setNodeId] = useState<string>("");
+
+  const data = {
+    nodes: [
+      {
+        id: "uid-c9329749475",
+        label: "n0",
+        class: "c0",
+        type: "uid-node",
+        extra: {
+          flag: true,
+        },
+      },
+      {
+        id: "did-c93297u3984u75",
+        label: "n0",
+        class: "c0",
+        type: "relation-node",
+        extra: {
+          flag: true,
+        },
+      },
+    ],
+  };
   const data1 = {
     nodes: [
       { id: "0", label: "n0", class: "c0", x: 1000, y: -100 },
@@ -271,10 +445,23 @@ const GptG6 = () => {
     const graph = new G6.Graph({
       container: ref.current!,
       ...DefaultGraphCfg,
-      plugins: [miniMap, ToolBar, Toolbar, ContextMenu],
+      plugins: [miniMap, ToolBar, Toolbar],
     });
 
-    graph.data(data1);
+    graph.data(data);
+
+    graph.on("node:contextmenu", (evt) => {
+      evt.preventDefault();
+
+      setDbClickMenuVisiable(false);
+      const node = evt.item as INode;
+
+      const { x, y } = node.getModel(); // 获得该节点的位置，对应 pointX/pointY 坐标
+      const clientXY = graph.getCanvasByPoint(x!, y!);
+      setNodeXY([clientXY.x, clientXY.y]);
+      setDbNode(node);
+      setDbClickMenuVisiable(true);
+    });
 
     // 用于清除所有状态
     const clearAllStates = () => {
@@ -432,6 +619,14 @@ const GptG6 = () => {
           <div className="toolBar" id="toolBar"></div>
         </div>
       </G6Container>
+      {
+          dbClickMenuVisiable && 
+          <ContextMenu
+            node={dbNode as INode}
+            nodeXY={nodeXY}
+            setDbClickMenuVisiable={setDbClickMenuVisiable}
+          />
+       }
     </Fragment>
   );
 };

@@ -1,0 +1,204 @@
+{
+    "stat_data": [
+        {
+            "country": "中国",
+            "province": "山东省",
+            "city": "济南市",
+            "area": "长清区",
+            "user_cnt": 6,
+            "location": "中国山东省济南市长清区",
+            "longitude": "116.745880",
+            "latitude": "36.561049"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "海淀区",
+            "user_cnt": 5,
+            "location": "中国北京市北京市海淀区",
+            "longitude": "116.310316",
+            "latitude": "39.956074"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "大兴区",
+            "user_cnt": 7,
+            "location": "中国北京市北京市大兴区",
+            "longitude": "116.338033",
+            "latitude": "39.728908"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "顺义区",
+            "user_cnt": 8,
+            "location": "中国北京市北京市顺义区",
+            "longitude": "116.653525",
+            "latitude": "40.128936"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "东城区",
+            "user_cnt": 5,
+            "location": "中国北京市北京市东城区",
+            "longitude": "116.416300",
+            "latitude": "39.928360"
+        },
+        {
+            "country": "中国",
+            "province": "山东省",
+            "city": "济南市",
+            "area": "市中区",
+            "user_cnt": 7,
+            "location": "中国山东省济南市市中区",
+            "longitude": "116.998980",
+            "latitude": "36.657354"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "怀柔区",
+            "user_cnt": 6,
+            "location": "中国北京市北京市怀柔区",
+            "longitude": "116.637122",
+            "latitude": "40.324272"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "丰台区",
+            "user_cnt": 3,
+            "location": "中国北京市北京市丰台区",
+            "longitude": "116.286968",
+            "latitude": "39.863642"
+        },
+        {
+            "country": "中国",
+            "province": "山东省",
+            "city": "济南市",
+            "area": "历下区",
+            "user_cnt": 4,
+            "location": "中国山东省济南市历下区",
+            "longitude": "117.038620",
+            "latitude": "36.664169"
+        },
+        {
+            "country": "中国",
+            "province": "山东省",
+            "city": "济南市",
+            "area": "天桥区",
+            "user_cnt": 5,
+            "location": "中国山东省济南市天桥区",
+            "longitude": "116.996086",
+            "latitude": "36.693374"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "朝阳区",
+            "user_cnt": 2,
+            "location": "中国北京市北京市朝阳区",
+            "longitude": "116.486409",
+            "latitude": "39.921489"
+        },
+        {
+            "country": "中国",
+            "province": "山东省",
+            "city": "济南市",
+            "area": "槐荫区",
+            "user_cnt": 7,
+            "location": "中国山东省济南市槐荫区",
+            "longitude": "116.947921",
+            "latitude": "36.668205"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "延庆区",
+            "user_cnt": 6,
+            "location": "中国北京市北京市延庆区",
+            "longitude": "115.985006",
+            "latitude": "40.465325"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "石景山",
+            "user_cnt": 3,
+            "location": "中国北京市北京市石景山",
+            "longitude": "116.195445",
+            "latitude": "39.914601"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "密云区",
+            "user_cnt": 2,
+            "location": "中国北京市北京市密云区",
+            "longitude": "116.843352",
+            "latitude": "40.377362"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "通州区",
+            "user_cnt": 6,
+            "location": "中国北京市北京市通州区",
+            "longitude": "116.658603",
+            "latitude": "39.902486"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "昌平区",
+            "user_cnt": 6,
+            "location": "中国北京市北京市昌平区",
+            "longitude": "116.235906",
+            "latitude": "40.218085"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "房山区",
+            "user_cnt": 6,
+            "location": "中国北京市北京市房山区",
+            "longitude": "116.139157",
+            "latitude": "39.735535"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "西城区",
+            "user_cnt": 4,
+            "location": "中国北京市北京市西城区",
+            "longitude": "116.365900",
+            "latitude": "39.912600"
+        },
+        {
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "area": "门头沟",
+            "user_cnt": 2,
+            "location": "中国北京市北京市门头沟",
+            "longitude": "116.105381",
+            "latitude": "39.937183"
+        }
+    ]
+}

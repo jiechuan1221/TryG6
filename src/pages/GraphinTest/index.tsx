@@ -30,7 +30,7 @@ Graphin.registerBehavior("changeEdgesLabel", {
     };
   },
   changeLabel(evt: IG6GraphEvent) {
-    const edge = evt.item as IEdge;
+    const edge = evt.item as any;
     const model = edge.getModel() as EdgeConfig;
     model.style = { label: { value: model.id } };
     edge.updateShape("style");
