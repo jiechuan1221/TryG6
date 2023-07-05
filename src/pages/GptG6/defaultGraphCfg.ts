@@ -112,8 +112,7 @@ export const getToolbar = () =>
   });
 
 const DefaultGraphCfg = {
-  width: 800,
-  height: 600,
+
   defaultNode: {
     type: "circle",
     size: 40,
@@ -195,15 +194,17 @@ const DefaultGraphCfg = {
   modes: {
     default: [
       "drag-node",
-      "drag-canvas",
-      "zoom-canvas",
+      // "drag-canvas",
+      // "zoom-canvas",
       "select-node",
       "lasso-select",
     ],
-    addEdge: ["click-add-edge", "click-select"],
-    delEdge: ["click-del-edge", "drag-node", "zoom-canvas"],
-    changeEdge: ["click-change-edge", "drag-node", "zoom-canvas"],
-    addNodeTag: ['click-add-nodeTag', 'drag-node', 'zoom-canvas']
+    dragCanvas: ['drag-canvas'],
+
+    // addEdge: ["click-add-edge", "click-select"],
+    // delEdge: ["click-del-edge", "drag-node", "zoom-canvas"],
+    // changeEdge: ["click-change-edge", "drag-node", "zoom-canvas"],
+    // addNodeTag: ['click-add-nodeTag', 'drag-node', 'zoom-canvas']
   },
   layout: {
     type: "forceAtlas2",

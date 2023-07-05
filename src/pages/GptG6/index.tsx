@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import G6, { IEdge, IEvent, INode, Item, ModelConfig } from "@antv/g6";
+import G6, { Graph, IEdge, IEvent, INode, Item, ModelConfig } from "@antv/g6";
 import DefaultGraphCfg, {
   getContextMenu,
   getMiniMap,
@@ -13,12 +13,28 @@ import { IGroup } from "@arco-design/chart-space/esm/typings/group";
 import image from "./uid-flag.svg";
 import img from "./relation-flag.svg";
 import ContextMenu from "./contextmenu";
+import BottomBar from "./bottom-bar";
+// import { Tooltip } from "antd";
+import TooltipComponent from "@arco-design/web-react/es/Tooltip";
+import { Tooltip } from "@arco-design/web-react";
 
-const G6Container = styled.div`
+interface G6ContainerProps {
+  cursor: string;
+}
+const G6Container = styled.div<G6ContainerProps>`
   position: relative;
   margin: 50px;
+  background: #f6f7fb;
+
   div {
     canvas {
+      cursor: ${(props) => {
+        if (props.cursor === "grab") {
+          return props.cursor + "!important";
+        } else {
+          return props.cursor;
+        }
+      }};
       border: 1px solid lightBlue;
     }
   }
@@ -62,8 +78,6 @@ G6.registerBehavior("click-add-edge", {
       graph.updateItem(self.edge, {
         target: model.id,
       });
-
-      console.log(self);
 
       graph.refreshItem(self.edge);
       self.edge = null;
@@ -126,7 +140,6 @@ G6.registerBehavior("click-change-edge", {
     const currentEdge = ev.item as IEdge;
     const graph = self.graph as any;
     const model = currentEdge.getModel();
-    console.log(model);
     graph.updateItem(currentEdge, {
       style: {
         stroke: "lightBlue", // 边的颜色改为红色
@@ -183,8 +196,6 @@ G6.registerBehavior("click-add-nodeTag", {
 
 G6.registerNode("uid-node", {
   draw: (cfg: any, group: any) => {
-    console.log(cfg);
-
     const keyShape = group!.addShape("circle", {
       attrs: {
         r: 12,
@@ -355,6 +366,13 @@ const GptG6 = () => {
   const [nodeXY, setNodeXY] = useState<number[]>([]);
   const [nodeId, setNodeId] = useState<string>("");
 
+  const [bottomBarVisiable, setBottomBarVisiable] = useState(false);
+  const [graph, setGraph] = useState<Graph | undefined>();
+  const [cursor, setCursor] = useState<string>("default");
+  const [width, setWidth] = useState<number>(800);
+  const [height, setHeight] = useState<number>(600);
+  const ele = document.getElementById("test-enlarge");
+
   const data = {
     nodes: [
       {
@@ -441,12 +459,18 @@ const GptG6 = () => {
     const Toolbar = getToolbar();
 
     G6.Util.processParallelEdges(data1.edges);
+  console.log(ele?.clientHeight, ele?.clientWidth);
+
 
     const graph = new G6.Graph({
       container: ref.current!,
+      width: ele?.clientWidth || 800,
+      height: ele?.clientHeight || 600,
       ...DefaultGraphCfg,
-      plugins: [miniMap, ToolBar, Toolbar],
+      // plugins: [miniMap, ToolBar, Toolbar],
     });
+
+    setGraph(graph);
 
     graph.data(data);
 
@@ -476,10 +500,14 @@ const GptG6 = () => {
       graph.setAutoPaint(true);
     };
     // 监听鼠标左击画布，清除边和节点的所有状态
-    graph.on("canvas:click", () => {
+    graph.on("canvas:contextmenu", (evt: any) => {
+      evt.stopPropagation();
+    })
+    graph.on("canvas:click", (evt: any) => {
+      // evt.stopPropagation();
       clearAllStates();
       // graph.off("click-add-edge")
-      graph.setMode("default");
+      // graph.setMode("default");
     });
     // 监听鼠标进入节点
     graph.on("node:mouseenter", (e) => {
@@ -489,6 +517,11 @@ const GptG6 = () => {
     });
     // 监听鼠标离开节点
     graph.on("node:mouseleave", (e) => {
+      // if(graph.getCurrentMode() === 'dragCanvas') {
+      //   console.log(graph.getCurrentMode());
+
+      //   setCursor('grab');
+      // }
       const nodeItem = e.item!;
       // 设置目标节点的 hover 状态 false
       graph.setItemState(nodeItem, "hover", false);
@@ -610,23 +643,39 @@ const GptG6 = () => {
     return () => {
       graph.destroy();
     };
-  }, []);
+  }, [width || height]);
 
   return (
     <Fragment>
-      <G6Container>
-        <div ref={ref}>
-          <div className="toolBar" id="toolBar"></div>
+      <G6Container cursor={cursor}>
+        <div
+          ref={ref}
+          style={{ width: "800px", height: '600px', position: "absolute", border: '1px solid grey' }}
+          id="test-enlarge"
+          onClick={(evt) => {
+            evt.stopPropagation();
+          }}
+        >
+          {/* <div className="toolBar" id="toolBar"></div> */}
+          {/* {bottomBarVisiable && ( */}
+          <BottomBar
+            bottomBarVisiable={bottomBarVisiable}
+            graph={graph}
+            setCursor={setCursor}
+            setWidth={setWidth}
+            setHeight={setHeight}
+          />
+          {/* )} */}
         </div>
       </G6Container>
-      {
-          dbClickMenuVisiable && 
-          <ContextMenu
-            node={dbNode as INode}
-            nodeXY={nodeXY}
-            setDbClickMenuVisiable={setDbClickMenuVisiable}
-          />
-       }
+      {/* <BottomBar /> */}
+      {dbClickMenuVisiable && (
+        <ContextMenu
+          node={dbNode as INode}
+          nodeXY={nodeXY}
+          setDbClickMenuVisiable={setDbClickMenuVisiable}
+        />
+      )}
     </Fragment>
   );
 };
