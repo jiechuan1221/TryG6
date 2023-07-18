@@ -1,22 +1,11 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import { QuestionCircleOutlined } from "@ant-design/icons";
 import G6, { Graph, IEdge, IEvent, INode, Item, ModelConfig } from "@antv/g6";
-import DefaultGraphCfg, {
-  getContextMenu,
-  getMiniMap,
-  getToolbar,
-  getToolBar,
-} from "./defaultGraphCfg";
+import DefaultGraphCfg from "./defaultGraphCfg";
 import styled from "styled-components";
-import { IModuleConf } from "@wangeditor/editor";
-import { IGroup } from "@arco-design/chart-space/esm/typings/group";
 import image from "./uid-flag.svg";
 import img from "./relation-flag.svg";
 import ContextMenu from "./contextmenu";
 import BottomBar from "./bottom-bar";
-// import { Tooltip } from "antd";
-import TooltipComponent from "@arco-design/web-react/es/Tooltip";
-import { Tooltip } from "@arco-design/web-react";
 
 interface G6ContainerProps {
   cursor: string;
@@ -331,7 +320,6 @@ G6.registerNode("relation-node", {
     }
   },
 });
-
 // Scale Animation
 G6.registerNode(
   "circle-animate",
@@ -356,6 +344,30 @@ G6.registerNode(
   "circle"
 );
 
+const get30Day = () => {
+  const date1 = new Date();
+  const date2 = new Date(date1);
+  date2.setDate(date1.getDate() - 30);
+
+  const agoDay = `${date2.getFullYear()}-${
+    date2.getMonth() + 1 < 10
+      ? `0${date2.getMonth() + 1}`
+      : date2.getMonth() + 1
+  }-${
+    date2.getDate() + 1 < 10 ? `0${date2.getDate() + 1}` : date2.getDate() + 1
+  }`;
+
+  const nowDay = `${date1.getFullYear()}-${
+    date1.getMonth() + 1 < 10
+      ? `0${date1.getMonth() + 1}`
+      : date1.getMonth() + 1
+  }-${
+    date1.getDate() + 1 < 10 ? `0${date1.getDate() + 1}` : date1.getDate() + 1
+  }`;
+
+  // return [dayj(agoDay), dayjs(nowDay)];
+};
+
 const GptG6 = () => {
   const ref = useRef(null);
 
@@ -372,6 +384,121 @@ const GptG6 = () => {
   const [width, setWidth] = useState<number>(800);
   const [height, setHeight] = useState<number>(600);
   const ele = document.getElementById("test-enlarge");
+
+  const nodes = [
+    {
+      id: "did-1201079237751822",
+      type: "relation-node",
+      label: "",
+      extra: {},
+      cluster: 1,
+    },
+    {
+      id: "follow-1128_4327323071940039-1128_84721266885",
+      type: "relation-node",
+      label: "",
+      extra: {},
+      cluster: 1,
+    },
+    {
+      id: "txt-1128_84721266885-1128_4327323071940039",
+      type: "relation-node",
+      label: "",
+      extra: {},
+      cluster: 1,
+    },
+    {
+      id: "uid-1128_4327323071940039",
+      type: "uid-node",
+      label: "",
+      extra: {},
+      cluster: 1,
+    },
+    {
+      id: "uid-1128_84721266885",
+      type: "uid-node",
+      label: "",
+      extra: {},
+      cluster: 1,
+    },
+    {
+      id: "wifimac-fc:2e:19:0f:9f:de",
+      type: "relation-node",
+      label: "",
+      extra: {},
+      cluster: 1,
+    },
+  ];
+  const edges = [
+    {
+      id: "1128_4327323071940039_1201079237751822",
+      type: "uid_did",
+      label: "",
+      extra: "",
+      source: "uid-1128_4327323071940039",
+      target: "did-1201079237751822",
+    },
+    {
+      id: "1128_84721266885_1201079237751822",
+      type: "uid_did",
+      label: "",
+      extra: "",
+      source: "uid-1128_84721266885",
+      target: "did-1201079237751822",
+    },
+    {
+      id: "3",
+      type: "uid_follow",
+      label: "",
+      extra: "",
+      source: "uid-1128_4327323071940039",
+      target: "follow-1128_4327323071940039-1128_84721266885",
+    },
+    {
+      id: "",
+      type: "uid_follow",
+      label: "",
+      extra: "",
+      source: "uid-1128_84721266885",
+      target: "follow-1128_4327323071940039-1128_84721266885",
+    },
+    {
+      id: "4",
+      type: "uid_txt",
+      label: "",
+      extra: "",
+      source: "uid-1128_84721266885",
+      target: "txt-1128_84721266885-1128_4327323071940039",
+    },
+    {
+      id: "5",
+      type: "uid_txt",
+      label: "",
+      extra: "",
+      source: "uid-1128_4327323071940039",
+      target: "txt-1128_84721266885-1128_4327323071940039",
+    },
+    {
+      id: "1128_4327323071940039_fc:2e:19:0f:9f:de",
+      type: "uid_wifimac",
+      label: "",
+      extra: "",
+      source: "uid-1128_4327323071940039",
+      target: "wifimac-fc:2e:19:0f:9f:de",
+    },
+    {
+      id: "1128_84721266885_fc:2e:19:0f:9f:de",
+      type: "uid_wifimac",
+      label: "",
+      extra: "",
+      source: "uid-1128_84721266885",
+      target: "wifimac-fc:2e:19:0f:9f:de",
+    },
+  ];
+  const data2 = {
+    nodes,
+    edges,
+  };
 
   const data = {
     nodes: [
@@ -453,26 +580,18 @@ const GptG6 = () => {
   };
 
   useEffect(() => {
-    const ContextMenu = getContextMenu();
-    const miniMap = getMiniMap();
-    const ToolBar = getToolBar();
-    const Toolbar = getToolbar();
-
     G6.Util.processParallelEdges(data1.edges);
-  console.log(ele?.clientHeight, ele?.clientWidth);
-
 
     const graph = new G6.Graph({
       container: ref.current!,
       width: ele?.clientWidth || 800,
       height: ele?.clientHeight || 600,
       ...DefaultGraphCfg,
-      // plugins: [miniMap, ToolBar, Toolbar],
     });
 
     setGraph(graph);
 
-    graph.data(data);
+    graph.data(data2);
 
     graph.on("node:contextmenu", (evt) => {
       evt.preventDefault();
@@ -487,7 +606,6 @@ const GptG6 = () => {
       setDbClickMenuVisiable(true);
     });
 
-    // 用于清除所有状态
     const clearAllStates = () => {
       graph.setAutoPaint(false);
       graph.getNodes().forEach(function (node) {
@@ -499,23 +617,20 @@ const GptG6 = () => {
       graph.paint();
       graph.setAutoPaint(true);
     };
-    // 监听鼠标左击画布，清除边和节点的所有状态
     graph.on("canvas:contextmenu", (evt: any) => {
       evt.stopPropagation();
-    })
+    });
     graph.on("canvas:click", (evt: any) => {
       // evt.stopPropagation();
       clearAllStates();
       // graph.off("click-add-edge")
       // graph.setMode("default");
     });
-    // 监听鼠标进入节点
     graph.on("node:mouseenter", (e) => {
       const nodeItem = e.item!;
       // 设置目标节点的 hover 状态 为 true
       graph.setItemState(nodeItem, "hover", true);
     });
-    // 监听鼠标离开节点
     graph.on("node:mouseleave", (e) => {
       // if(graph.getCurrentMode() === 'dragCanvas') {
       //   console.log(graph.getCurrentMode());
@@ -526,7 +641,6 @@ const GptG6 = () => {
       // 设置目标节点的 hover 状态 false
       graph.setItemState(nodeItem, "hover", false);
     });
-    // 监听鼠标点击节点
     graph.on("node:click", (e) => {
       clearAllStates();
       //   设置当前节点状态为被选中
@@ -548,82 +662,7 @@ const GptG6 = () => {
         graph.setItemState(edge, "active", true);
       });
     });
-    // 监听鼠标拖拽节点
-    // graph.on("node:dragstart", (evt) => {
-    //   if (evt.item?.getStates()[0] === "selected") {
-    //     // 如果点击则拖拽一组节点
-    //     const node = evt.item as INode;
-    //     const originX = evt.canvasX;
-    //     const originY = evt.canvasY;
 
-    //     // 获取相关节点
-    //     const getRelatedNodes = (node: INode) => {
-    //       const edges = node?._cfg?.edges;
-    //       const dragNodes: INode[] = [];
-    //       edges.forEach((edge: IEdge) => {
-    //         const target = edge.getTarget();
-    //         const source = edge.getSource();
-    //         if (target.get("id") !== node.get("id")) {
-    //           dragNodes.push(graph.findById(target.get("id")) as INode);
-    //         }
-    //         if (source.get("id") !== node.get("id")) {
-    //           dragNodes.push(graph.findById(source.get("id")) as INode);
-    //         }
-    //       });
-    //       return dragNodes;
-    //     };
-    //     const relatedNodes = getRelatedNodes(node);
-    //     graph.set("relatedNodes", relatedNodes);
-    //     graph.set("relatedEdges", false);
-
-    //     // 拖拽时，相关节点跟随移动
-    //     graph.on("node:drag", (evt) => {
-    //       const relatedNodes = graph.get("relatedNodes");
-    //       relatedNodes.forEach((rnode: INode) => {
-    //         const x = rnode.getCanvasBBox().x + evt.clientX - originX;
-    //         const y = rnode.getCanvasBBox().y + evt.clientY - originY;
-    //         graph.updateItem(rnode, { x: x, y: y });
-    //         graph.set("relatedEdges", true);
-    //       });
-    //       // 设置与该节点相关的所有边也需要跟随移动
-    //     });
-    //     graph.on("afterupdate", () => {
-    //       const relatedEdges = graph.get("relatedEdges");
-    //       if (relatedEdges) {
-    //         // 遍历所有边并重新设置起点和终点的位置
-    //         const edges = graph.getEdges();
-    //         edges.forEach((e) => {
-    //           const source = e.getSource();
-    //           const target = e.getTarget();
-    //           if (
-    //             relatedNodes.includes(source) ||
-    //             relatedNodes.includes(target)
-    //           ) {
-    //             const sourceModel = source.getModel();
-    //             const targetModel = target.getModel();
-    //             graph.updateItem(e, {
-    //               source: {
-    //                 x: sourceModel.x,
-    //                 y: sourceModel.y,
-    //               },
-    //               target: {
-    //                 x: targetModel.x,
-    //                 y: targetModel.y,
-    //               },
-    //             });
-    //           }
-    //         });
-    //         // 重置 relatedEdges
-    //         graph.set("relatedEdges", false);
-    //       }
-    //     });
-    //     // graph.on("node:dragend", () => {
-    //     //   graph.off("node:drag");
-    //     // });
-    //   }
-    // });
-
-    // 监听鼠标点击边
     graph.on("edge:click", (e) => {
       const clickEdges = graph.findAllByState("edge", "click");
       clickEdges.forEach((cn) => {
@@ -632,7 +671,6 @@ const GptG6 = () => {
       const edgeItem = e.item!;
       graph.setItemState(edgeItem, "click", true);
     });
-    // 监听鼠标hover边
     graph.on("edge:mouseenter", (e) => {
       const edgeItem = e.item!;
       graph.setItemState(edgeItem, "hover", true);
@@ -643,21 +681,24 @@ const GptG6 = () => {
     return () => {
       graph.destroy();
     };
-  }, [width || height]);
+  }, []);
 
   return (
     <Fragment>
       <G6Container cursor={cursor}>
         <div
           ref={ref}
-          style={{ width: "800px", height: '600px', position: "absolute", border: '1px solid grey' }}
+          style={{
+            width: "800px",
+            height: "600px",
+            position: "absolute",
+            border: "1px solid grey",
+          }}
           id="test-enlarge"
           onClick={(evt) => {
             evt.stopPropagation();
           }}
         >
-          {/* <div className="toolBar" id="toolBar"></div> */}
-          {/* {bottomBarVisiable && ( */}
           <BottomBar
             bottomBarVisiable={bottomBarVisiable}
             graph={graph}
@@ -665,10 +706,8 @@ const GptG6 = () => {
             setWidth={setWidth}
             setHeight={setHeight}
           />
-          {/* )} */}
         </div>
       </G6Container>
-      {/* <BottomBar /> */}
       {dbClickMenuVisiable && (
         <ContextMenu
           node={dbNode as INode}

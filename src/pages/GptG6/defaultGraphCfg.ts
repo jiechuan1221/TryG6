@@ -200,7 +200,6 @@ const DefaultGraphCfg = {
       "lasso-select",
     ],
     dragCanvas: ['drag-canvas'],
-
     // addEdge: ["click-add-edge", "click-select"],
     // delEdge: ["click-del-edge", "drag-node", "zoom-canvas"],
     // changeEdge: ["click-change-edge", "drag-node", "zoom-canvas"],
