@@ -3,9 +3,12 @@ import G6, { Graph, IEdge, IEvent, INode, Item, ModelConfig } from "@antv/g6";
 import DefaultGraphCfg from "./defaultGraphCfg";
 import styled from "styled-components";
 import image from "./uid-flag.svg";
-import img from "./relation-flag.svg";
+import img from "./flag.svg";
+import fileImg from "./file.svg";
 import ContextMenu from "./contextmenu";
 import BottomBar from "./bottom-bar";
+import FleList from "./file-list";
+import { IGroup } from "@arco-design/chart-space/esm/typings/group";
 
 interface G6ContainerProps {
   cursor: string;
@@ -185,6 +188,8 @@ G6.registerBehavior("click-add-nodeTag", {
 
 G6.registerNode("uid-node", {
   draw: (cfg: any, group: any) => {
+    const flag = (cfg as any).extra.flag;
+    const filed = (cfg as any).extra.filed;
     const keyShape = group!.addShape("circle", {
       attrs: {
         r: 12,
@@ -195,7 +200,7 @@ G6.registerNode("uid-node", {
       isKeyShape: true,
       name: "circle",
     });
-    if (cfg!.extra.flag) {
+    if (flag) {
       group!.addShape("image", {
         attrs: {
           x: -5,
@@ -209,6 +214,22 @@ G6.registerNode("uid-node", {
         draggable: true,
         icon: true,
         name: "tag",
+      });
+    }
+    if (filed) {
+      group!.addShape("image", {
+        attrs: {
+          x: -16,
+          y: -16,
+          width: 12,
+          height: 12,
+          stroke: "#bfc",
+          cursor: "default",
+          img: fileImg,
+        },
+        draggable: true,
+        icon: true,
+        name: "file-tag",
       });
     }
     return keyShape;
@@ -243,20 +264,61 @@ const NODE_TEXT = {
 };
 
 G6.registerNode("relation-node", {
-  draw: (cfg: any, group: any) => {
+  draw: (cfg: ModelConfig | undefined, group: any) => {
     const node_text: string =
       NODE_TEXT[(cfg!.id as string).split("-")[0] as keyof typeof NODE_TEXT];
 
     let strockColor = "rgba(0, 0, 0, 0)";
-    let fillColor = "rgba(0, 0, 0, 0)";
-    if (cfg!.extra.flag) {
+    let fillColor = "#f6f7fb";
+    const flag = (cfg as any).extra.flag;
+    const filed = (cfg as any).extra.filed;
+    if (flag) {
       strockColor = "#E5E8EF";
       fillColor = "#fff";
     }
 
-    const keyShape = group!.addShape("rect", {
+    const getWidth = () => {
+      const add_num = flag ? 16 : 0;
+      switch (node_text) {
+        case "IP":
+          return 25 + add_num;
+        case "DID":
+          return 32 + add_num;
+        case "TXT":
+          return 32 + add_num;
+        case "互关":
+          return 35 + add_num;
+        case "同群":
+          return 35 + add_num;
+        case "店铺":
+          return 35 + add_num;
+        case "手机号":
+          return 47 + add_num;
+        case "身份证":
+          return 47 + add_num;
+        case "WIFIMAC":
+          return 62 + add_num;
+        default:
+          return 30 + add_num;
+      }
+    };
+    const keyShape = group!.addShape("circle", {
       attrs: {
-        width: node_text.length * 11,
+        r: 1,
+        x: getWidth() / 2,
+        y: 10,
+        stroke: "#fff",
+        fill: "rgba(0, 0, 0, 0)",
+        cursor: "pointer",
+      },
+      isKeyShape: true,
+      draggable: true,
+      name: "circle",
+    });
+
+    group!.addShape("rect", {
+      attrs: {
+        width: getWidth(),
         height: 20,
         stroke: strockColor,
         fill: fillColor,
@@ -269,10 +331,27 @@ G6.registerNode("relation-node", {
       draggable: true,
       name: "rect",
     });
+    // 用于在添加连接线的时候改变样式，否则会直接将打标的节点样式修改了
+    group!.addShape("rect", {
+      attrs: {
+        width: getWidth(),
+        height: 20,
+        stroke: "rgba(0, 0, 0, 0)",
+        fill: "rgba(0, 0, 0, 0)",
+        radius: 3,
+        cursor: "pointer",
+        textAlign: "center",
+        textBaseline: "middle",
+        shadowBlur: 12,
+      },
+      draggable: true,
+      name: "rect2",
+    });
 
+    const textX = flag ? getWidth() / 2 + 7 : getWidth() / 2;
     group!.addShape("text", {
       attrs: {
-        x: (node_text.length * 11) / 2,
+        x: textX,
         y: 10,
         text: node_text,
         fontSiz: 12,
@@ -286,28 +365,67 @@ G6.registerNode("relation-node", {
       name: "text",
     });
 
-    if (cfg!.extra.flag) {
+    // 添加锚点
+    const bbox = group!.getBBox();
+    const anchorPoints = [
+      [0.5, 0],
+      [1, 0.5],
+      [0, 0.5],
+      [0.5, 1],
+    ];
+    anchorPoints.forEach((anchorPos, i) => {
+      group!.addShape("circle", {
+        attrs: {
+          r: 4,
+          x: bbox.x + bbox.width * anchorPos[0],
+          y: bbox.y + bbox.height * anchorPos[1],
+          fill: "#fff",
+          stroke: "#808080",
+        },
+        name: `anchor-point`,
+        anchorPointIdx: i,
+        links: 0,
+        visible: false,
+        draggable: true,
+      });
+    });
+
+    if (flag) {
       group!.addShape("image", {
         attrs: {
-          x: -5,
-          y: -4.5,
-          width: 10,
-          height: 10,
+          x: 5,
+          y: 4.5,
+          width: 12,
+          height: 12,
           stroke: "#bfc",
           cursor: "pointer",
           img: img,
         },
-        // icon: true,
         draggable: true,
         name: "tag",
       });
     }
-
+    if (filed) {
+      group!.addShape("image", {
+        attrs: {
+          x: -8,
+          y: -6,
+          width: 12,
+          height: 12,
+          stroke: "#bfc",
+          cursor: "default",
+          img: fileImg,
+        },
+        draggable: true,
+        name: "file-tag",
+      });
+    }
+    group?.setZIndex(1);
     return keyShape;
   },
   setState(name, value, item: Item | undefined) {
     const group = (item as Item).getContainer();
-    const shape = group.get("children")[1];
+    const shape = group.get("children")[3];
 
     const hasSelected = (item as Item).hasState("selected");
     const hasActive = (item as Item).hasState("active");
@@ -384,6 +502,8 @@ const GptG6 = () => {
   const [width, setWidth] = useState<number>(800);
   const [height, setHeight] = useState<number>(600);
   const ele = document.getElementById("test-enlarge");
+
+  const [fileShow, setFileShow] = useState(false);
 
   const nodes = [
     {
@@ -580,7 +700,7 @@ const GptG6 = () => {
   };
 
   useEffect(() => {
-    G6.Util.processParallelEdges(data1.edges);
+    // G6.Util.processParallelEdges(data1.edges);
 
     const graph = new G6.Graph({
       container: ref.current!,
@@ -607,6 +727,7 @@ const GptG6 = () => {
     });
 
     const clearAllStates = () => {
+      setFileShow(false);
       graph.setAutoPaint(false);
       graph.getNodes().forEach(function (node) {
         graph.clearItemStates(node);
@@ -644,6 +765,15 @@ const GptG6 = () => {
     graph.on("node:click", (e) => {
       clearAllStates();
       //   设置当前节点状态为被选中
+      if (e.target.get("name") === "file-tag") {
+        console.log("ttttttttttt");
+        const node = e.item as INode;
+        setFileShow(true);
+        const { x, y } = node.getModel(); // 获得该节点的位置，对应 pointX/pointY 坐标
+        const clientXY = graph.getCanvasByPoint(x!, y!);
+        setNodeXY([clientXY.x, clientXY.y]);
+        return;
+      }
       const { item } = e;
       const itemId = item!.get("id");
       graph.setItemState(itemId, "selected", true);
@@ -662,6 +792,18 @@ const GptG6 = () => {
         graph.setItemState(edge, "active", true);
       });
     });
+    // graph.on('node:hover', (evt) => {
+    //   if(evt.target.get('name') === 'file-tag') {
+    //     console.log('ttttttttttt');
+
+    //     const node = evt.item as INode;
+    //     setFileShow(true);
+    //     const { x, y } = node.getModel(); // 获得该节点的位置，对应 pointX/pointY 坐标
+    //     const clientXY = graph.getCanvasByPoint(x!, y!);
+    //     setNodeXY([clientXY.x, clientXY.y]);
+    //     return ;
+    //   }
+    // })
 
     graph.on("edge:click", (e) => {
       const clickEdges = graph.findAllByState("edge", "click");
@@ -713,6 +855,12 @@ const GptG6 = () => {
           node={dbNode as INode}
           nodeXY={nodeXY}
           setDbClickMenuVisiable={setDbClickMenuVisiable}
+        />
+      )}
+      {fileShow && (
+        <FleList
+          // node={node}
+          nodeXY={nodeXY}
         />
       )}
     </Fragment>

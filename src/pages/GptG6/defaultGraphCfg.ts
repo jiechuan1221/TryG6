@@ -216,6 +216,18 @@ const DefaultGraphCfg = {
   //   监听一组节点跟随移动，开启多选模式
   multiple: true,
   fitCenter: false,
+  // type: "comboCombined",
+  //   preventOverlap: true,
+  //   linkDistance: 30,
+  //   outerLayout: new G6.Layout['grid']({}),
+  //   innerLayout: new G6.Layout['forceAtlas2']({
+  //     preset: 'radial',
+  //     linkDistance: 40,
+  //     nodeStrength: 30,    
+  //     edgeStrength: 0.1, 
+  //     dissuadeHubs: true,
+  //     preventOverlap: true
+  //   })
 };
 
 export default DefaultGraphCfg;

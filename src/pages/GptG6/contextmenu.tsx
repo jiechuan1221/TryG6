@@ -19,7 +19,6 @@ const ContextMenuContainer = styled.div<ClickMenuStyleProps>`
   z-index: 2;
 
   width: 72px;
-  height: 44px;
   border: 1px solid #e5e8ef;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 2px;
@@ -37,9 +36,8 @@ const ContextMenuContainer = styled.div<ClickMenuStyleProps>`
 
 const ContextMenu: FC<CustomProps> = (props) => {
   const { node, nodeXY, setDbClickMenuVisiable } = props;
-
-  console.log(node);
   const tagged = (node.getModel() as any).extra.flag;
+  const filed = (node.getModel() as any).extra.file;
 
   return (
     <ContextMenuContainer nodeXY={nodeXY}>
@@ -52,6 +50,16 @@ const ContextMenu: FC<CustomProps> = (props) => {
         }}
       >
         {tagged ? "取消标记" : "标记风险"}
+      </div>
+      <div
+        className="item"
+        onClick={() => {
+          (node.getModel() as any).extra.filed = !filed;
+          node.refresh();
+          setDbClickMenuVisiable(false);
+        }}
+      >
+        {filed ? "取消上传" : "上传文件"}
       </div>
     </ContextMenuContainer>
   );
